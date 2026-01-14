@@ -13,7 +13,8 @@ public:
         TimeRole = Qt::UserRole + 1,
         CpuRole,
         RssRole,
-        GpuRole,
+        GpuComputeRole,
+        GpuDecodeRole,
         ThreadsRole
     };
 

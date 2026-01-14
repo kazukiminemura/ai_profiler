@@ -9,7 +9,8 @@ Item {
 
     property double cpuValue: 0
     property double rssValue: 0
-    property double gpuValue: 0
+    property double gpuComputeValue: 0
+    property double gpuDecodeValue: 0
     property int threadsValue: 0
     property double startEpochMs: 0
     property string elapsedText: "0:00"
@@ -34,7 +35,8 @@ Item {
             }
             cpuValue = frame.cpu
             rssValue = frame.rss
-            gpuValue = frame.gpu
+            gpuComputeValue = frame.gpuCompute
+            gpuDecodeValue = frame.gpuDecode
             threadsValue = frame.threads
             if (startEpochMs === 0) {
                 startEpochMs = frame.t
@@ -64,7 +66,9 @@ Item {
                     Rectangle { width: 10; height: 10; radius: 3; color: "#3ddc97" }
                     Text { text: "CPU"; color: "#8aa1b5"; font.pixelSize: 12 }
                     Rectangle { width: 10; height: 10; radius: 3; color: "#f6c453" }
-                    Text { text: "GPU"; color: "#8aa1b5"; font.pixelSize: 12 }
+                    Text { text: "GPU Compute"; color: "#8aa1b5"; font.pixelSize: 12 }
+                    Rectangle { width: 10; height: 10; radius: 3; color: "#f2a34a" }
+                    Text { text: "GPU Decode"; color: "#8aa1b5"; font.pixelSize: 12 }
                     Rectangle { width: 10; height: 10; radius: 3; color: "#58a6ff" }
                     Text { text: "RSS"; color: "#8aa1b5"; font.pixelSize: 12 }
                     Item { Layout.fillWidth: true }
@@ -113,15 +117,44 @@ Item {
 
                         RowLayout {
                             Layout.fillWidth: true
-                            Text { text: "GPU %"; color: "#8aa1b5"; font.pixelSize: 12 }
+                            Text { text: "GPU Compute %"; color: "#8aa1b5"; font.pixelSize: 12 }
                             Item { Layout.fillWidth: true }
-                            Text { text: gpuValue.toFixed(1); color: "#e8eef7"; font.pixelSize: 12 }
+                            Text { text: gpuComputeValue.toFixed(1); color: "#e8eef7"; font.pixelSize: 12 }
                         }
                         TimelineGraph {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            role: "gpu"
+                            role: "gpuCompute"
                             lineColor: "#f6c453"
+                            maxValue: 100
+                            model: timelineModel
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 10
+                    color: "#0b111a"
+                    border.color: "#1d2633"
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 8
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Text { text: "GPU Decode %"; color: "#8aa1b5"; font.pixelSize: 12 }
+                            Item { Layout.fillWidth: true }
+                            Text { text: gpuDecodeValue.toFixed(1); color: "#e8eef7"; font.pixelSize: 12 }
+                        }
+                        TimelineGraph {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            role: "gpuDecode"
+                            lineColor: "#f2a34a"
                             maxValue: 100
                             model: timelineModel
                         }

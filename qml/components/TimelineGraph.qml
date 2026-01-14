@@ -45,7 +45,10 @@ Canvas {
         ctx.beginPath()
         for (var k = 0; k < count; k++) {
             var it = model.get(k)
-            var v = (role === "cpu") ? it.cpu : (role === "gpu") ? it.gpu : it.rss
+            var v = (role === "cpu") ? it.cpu
+                : (role === "gpuCompute") ? it.gpuCompute
+                : (role === "gpuDecode") ? it.gpuDecode
+                : it.rss
             var x = (k / (count - 1)) * width
             var y = height - (v / maxVal) * height
             if (k === 0) ctx.moveTo(x, y)

@@ -12,9 +12,19 @@
 #include <pdhmsg.h>
 #include <cwchar>
 
+enum class GpuKind {
+    Compute,
+    VideoDecode
+};
+
+struct GpuCounter {
+    PDH_HCOUNTER counter = nullptr;
+    GpuKind kind = GpuKind::Compute;
+};
+
 struct GpuQuery {
     PDH_HQUERY query = nullptr;
-    QVector<PDH_HCOUNTER> counters;
+    QVector<GpuCounter> counters;
     bool available = false;
     QString error;
 };
@@ -60,10 +70,27 @@ bool initGpuQuery(GpuQuery &gpu, quint32 pid) {
     }
 
     for (wchar_t *p = buffer.data(); *p; p += std::wcslen(p) + 1) {
+        const QString path = QString::fromWCharArray(p);
+        const QString lower = path.toLower();
+        bool useCounter = false;
+        GpuKind kind = GpuKind::Compute;
+        if (lower.contains("engtype_videodecode")) {
+            useCounter = true;
+            kind = GpuKind::VideoDecode;
+        } else if (lower.contains("engtype_compute")) {
+            useCounter = true;
+            kind = GpuKind::Compute;
+        }
+        if (!useCounter) {
+            continue;
+        }
         PDH_HCOUNTER counter = nullptr;
         st = PdhAddEnglishCounterW(gpu.query, p, 0, &counter);
         if (st == ERROR_SUCCESS && counter) {
-            gpu.counters.push_back(counter);
+            GpuCounter item;
+            item.counter = counter;
+            item.kind = kind;
+            gpu.counters.push_back(item);
         }
     }
 
@@ -78,17 +105,20 @@ bool initGpuQuery(GpuQuery &gpu, quint32 pid) {
     return true;
 }
 
-double readGpuPercent(GpuQuery &gpu) {
+double readGpuPercent(GpuQuery &gpu, GpuKind kind) {
     if (!gpu.available || !gpu.query) return 0.0;
 
     const PDH_STATUS st = PdhCollectQueryData(gpu.query);
     if (st != ERROR_SUCCESS) return 0.0;
 
     double total = 0.0;
-    for (const auto &counter : gpu.counters) {
+    for (const auto &entry : gpu.counters) {
+        if (entry.kind != kind) {
+            continue;
+        }
         PDH_FMT_COUNTERVALUE val;
         DWORD type = 0;
-        if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, &type, &val) == ERROR_SUCCESS &&
+        if (PdhGetFormattedCounterValue(entry.counter, PDH_FMT_DOUBLE, &type, &val) == ERROR_SUCCESS &&
             val.CStatus == ERROR_SUCCESS) {
             total += val.doubleValue;
         }
@@ -227,7 +257,8 @@ void CounterSampler::startSampling(quint32 pid) {
         frame.epochMs = QDateTime::currentMSecsSinceEpoch();
         frame.cpuPercent = cpuPercent;
         frame.rssMB = rssMB;
-        frame.gpuPercent = m_gpu ? readGpuPercent(*m_gpu) : 0.0;
+        frame.gpuComputePercent = m_gpu ? readGpuPercent(*m_gpu, GpuKind::Compute) : 0.0;
+        frame.gpuDecodePercent = m_gpu ? readGpuPercent(*m_gpu, GpuKind::VideoDecode) : 0.0;
         frame.threadCount = countThreads(pid);
         emit frameReady(frame);
 

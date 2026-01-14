@@ -14,7 +14,8 @@ QVariant TimelineModel::data(const QModelIndex &index, int role) const {
     case TimeRole: return f.epochMs;
     case CpuRole: return f.cpuPercent;
     case RssRole: return f.rssMB;
-    case GpuRole: return f.gpuPercent;
+    case GpuComputeRole: return f.gpuComputePercent;
+    case GpuDecodeRole: return f.gpuDecodePercent;
     case ThreadsRole: return f.threadCount;
     default: return {};
     }
@@ -25,7 +26,8 @@ QHash<int, QByteArray> TimelineModel::roleNames() const {
         {TimeRole, "t"},
         {CpuRole, "cpu"},
         {RssRole, "rss"},
-        {GpuRole, "gpu"},
+        {GpuComputeRole, "gpuCompute"},
+        {GpuDecodeRole, "gpuDecode"},
         {ThreadsRole, "threads"}
     };
 }
@@ -44,7 +46,8 @@ QVariantMap TimelineModel::get(int index) const {
     map.insert("t", f.epochMs);
     map.insert("cpu", f.cpuPercent);
     map.insert("rss", f.rssMB);
-    map.insert("gpu", f.gpuPercent);
+    map.insert("gpuCompute", f.gpuComputePercent);
+    map.insert("gpuDecode", f.gpuDecodePercent);
     map.insert("threads", f.threadCount);
     return map;
 }
