@@ -22,7 +22,7 @@ Item {
                 model: hotspotModel
                 clip: true
                 delegate: Rectangle {
-                    width: parent.width
+                    width: ListView.view ? ListView.view.width : 0
                     height: 40
                     radius: 6
                     color: index % 2 === 0 ? "#0f1622" : "#101b2a"

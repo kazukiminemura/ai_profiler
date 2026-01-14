@@ -42,8 +42,6 @@ Canvas {
             maxVal = 100
         }
 
-        ctx.strokeStyle = lineColor
-        ctx.lineWidth = 2
         ctx.beginPath()
         for (var k = 0; k < count; k++) {
             var it = model.get(k)
@@ -53,6 +51,15 @@ Canvas {
             if (k === 0) ctx.moveTo(x, y)
             else ctx.lineTo(x, y)
         }
+        ctx.lineTo(width, height)
+        ctx.lineTo(0, height)
+        ctx.closePath()
+        ctx.fillStyle = lineColor
+        ctx.globalAlpha = 0.25
+        ctx.fill()
+        ctx.globalAlpha = 1.0
+        ctx.strokeStyle = lineColor
+        ctx.lineWidth = 2
         ctx.stroke()
     }
 
