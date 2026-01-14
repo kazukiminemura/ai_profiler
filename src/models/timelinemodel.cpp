@@ -39,10 +39,10 @@ QVariantMap TimelineModel::get(int index) const {
     QVariantMap map;
     if (index < 0 || index >= m_frames.size()) return map;
     const auto &f = m_frames[index];
-    map.insert(\"t\", f.epochMs);
-    map.insert(\"cpu\", f.cpuPercent);
-    map.insert(\"rss\", f.rssMB);
-    map.insert(\"threads\", f.threadCount);
+    map.insert("t", f.epochMs);
+    map.insert("cpu", f.cpuPercent);
+    map.insert("rss", f.rssMB);
+    map.insert("threads", f.threadCount);
     return map;
 }
 

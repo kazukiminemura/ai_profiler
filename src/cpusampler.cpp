@@ -15,7 +15,7 @@ quint64 fileTimeToUInt64(const FILETIME &ft) {
 CpuSampler::CpuSampler(QObject *parent) : QObject(parent) {}
 
 void CpuSampler::startSampling(quint32 pid) {
-    m_stop.store(false);
+    m_stop.storeRelease(false);
     HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
     if (!process) {
         emit error(QStringLiteral("OpenProcess failed (pid=%1)").arg(pid));
@@ -69,5 +69,5 @@ void CpuSampler::startSampling(quint32 pid) {
 }
 
 void CpuSampler::stopSampling() {
-    m_stop.store(true);
+    m_stop.storeRelease(true);
 }

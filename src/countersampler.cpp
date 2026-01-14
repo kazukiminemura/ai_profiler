@@ -31,7 +31,7 @@ int countThreads(quint32 pid) {
 CounterSampler::CounterSampler(QObject *parent) : QObject(parent) {}
 
 void CounterSampler::startSampling(quint32 pid) {
-    m_stop.store(false);
+    m_stop.storeRelease(false);
     HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, pid);
     if (!process) {
         emit error(QStringLiteral("OpenProcess failed (pid=%1)").arg(pid));
@@ -107,5 +107,5 @@ void CounterSampler::startSampling(quint32 pid) {
 }
 
 void CounterSampler::stopSampling() {
-    m_stop.store(true);
+    m_stop.storeRelease(true);
 }
