@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/">
+    <file>Main.qml</file>
+    <file>OverviewPage.qml</file>
+    <file>HotspotsPage.qml</file>
+    <file>components/Card.qml</file>
+    <file>components/TimelineGraph.qml</file>
+  </qresource>
+</RCC>
