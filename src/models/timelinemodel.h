@@ -13,6 +13,7 @@ public:
         TimeRole = Qt::UserRole + 1,
         CpuRole,
         RssRole,
+        GpuRole,
         ThreadsRole
     };
 
@@ -29,7 +30,7 @@ public:
     const QVector<CounterFrame> &frames() const { return m_frames; }
 
 signals:
-    void lastFrameChanged(const CounterFrame &frame);
+    void lastFrameChanged(const QVariantMap &frame);
     void countChanged();
 
 private:

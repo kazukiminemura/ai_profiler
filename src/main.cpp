@@ -1,6 +1,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+#include <QtQuickControls2/QQuickStyle>
 
 #include "models/timelinemodel.h"
 #include "models/hotspotmodel.h"
@@ -8,6 +9,7 @@
 #include "common/datamodels.h"
 
 int main(int argc, char *argv[]) {
+    QQuickStyle::setStyle("Fusion");
     QGuiApplication app(argc, argv);
 
     qRegisterMetaType<CounterFrame>();

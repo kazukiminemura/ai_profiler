@@ -3,9 +3,11 @@ import QtQuick 2.15
 Canvas {
     id: canvas
     property var model
-    property color cpuColor: "#3ddc97"
-    property color rssColor: "#58a6ff"
+    property string role: "cpu"
+    property color lineColor: "#3ddc97"
     property color gridColor: "#1d2633"
+    property real maxValue: 0
+    property bool showGrid: true
 
     onPaint: {
         var ctx = getContext("2d")
@@ -17,40 +19,41 @@ Canvas {
         var count = model ? model.count : 0
         if (count <= 1) return
 
-        // grid
-        ctx.strokeStyle = gridColor
-        ctx.lineWidth = 1
-        for (var i = 1; i <= 4; i++) {
-            var y = (height / 5) * i
-            ctx.beginPath()
-            ctx.moveTo(0, y)
-            ctx.lineTo(width, y)
-            ctx.stroke()
-        }
-
-        var maxRss = 1
-        for (var j = 0; j < count; j++) {
-            var item = model.get(j)
-            if (item.rss > maxRss) maxRss = item.rss
-        }
-
-        function drawLine(role, maxValue, color) {
-            ctx.strokeStyle = color
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            for (var i = 0; i < count; i++) {
-                var it = model.get(i)
-                var v = (role === "cpu") ? it.cpu : it.rss
-                var x = (i / (count - 1)) * width
-                var y = height - (v / maxValue) * height
-                if (i === 0) ctx.moveTo(x, y)
-                else ctx.lineTo(x, y)
+        if (showGrid) {
+            ctx.strokeStyle = gridColor
+            ctx.lineWidth = 1
+            for (var i = 1; i <= 4; i++) {
+                var y = (height / 5) * i
+                ctx.beginPath()
+                ctx.moveTo(0, y)
+                ctx.lineTo(width, y)
+                ctx.stroke()
             }
-            ctx.stroke()
         }
 
-        drawLine("cpu", 100, cpuColor)
-        drawLine("rss", maxRss, rssColor)
+        var maxVal = maxValue
+        if (role === "rss" && maxVal <= 0) {
+            maxVal = 1
+            for (var j = 0; j < count; j++) {
+                var item = model.get(j)
+                if (item.rss > maxVal) maxVal = item.rss
+            }
+        } else if (maxVal <= 0) {
+            maxVal = 100
+        }
+
+        ctx.strokeStyle = lineColor
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        for (var k = 0; k < count; k++) {
+            var it = model.get(k)
+            var v = (role === "cpu") ? it.cpu : (role === "gpu") ? it.gpu : it.rss
+            var x = (k / (count - 1)) * width
+            var y = height - (v / maxVal) * height
+            if (k === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+        }
+        ctx.stroke()
     }
 
     Connections {

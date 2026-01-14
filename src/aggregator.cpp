@@ -4,6 +4,7 @@
 #include <algorithm>
 
 Aggregator::Aggregator(QObject *parent) : QObject(parent) {
+    m_timer.setParent(this);
     m_timer.setInterval(2000);
     m_timer.setTimerType(Qt::CoarseTimer);
     connect(&m_timer, &QTimer::timeout, this, &Aggregator::flush);

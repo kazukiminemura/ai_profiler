@@ -64,8 +64,10 @@ void ProfilerController::stop() {
 }
 
 void ProfilerController::stopWorkers() {
-    if (m_counterSampler) QMetaObject::invokeMethod(m_counterSampler, "stopSampling", Qt::QueuedConnection);
-    if (m_cpuSampler) QMetaObject::invokeMethod(m_cpuSampler, "stopSampling", Qt::QueuedConnection);
+    // stopSampling is thread-safe; call directly so it works even if the worker
+    // thread is busy and its event loop is blocked by the sampling loop.
+    if (m_counterSampler) m_counterSampler->stopSampling();
+    if (m_cpuSampler) m_cpuSampler->stopSampling();
     if (m_aggregator) QMetaObject::invokeMethod(m_aggregator, "stop", Qt::QueuedConnection);
 
     m_counterThread.quit();

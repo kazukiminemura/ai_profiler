@@ -11,7 +11,7 @@ if (MSVC)
     add_compile_options(/Zc:__cplusplus)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
 
 qt_add_executable(ai_profiler
     src/main.cpp
@@ -33,8 +33,8 @@ qt_add_executable(ai_profiler
 
 target_include_directories(ai_profiler PRIVATE src)
 
-target_link_libraries(ai_profiler PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
+target_link_libraries(ai_profiler PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2)
 
 if (WIN32)
-    target_link_libraries(ai_profiler PRIVATE Psapi)
+    target_link_libraries(ai_profiler PRIVATE Psapi Pdh)
 endif()

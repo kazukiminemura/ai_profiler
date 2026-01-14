@@ -8,6 +8,7 @@ struct CounterFrame {
     qint64 epochMs = 0;
     double cpuPercent = 0.0;
     double rssMB = 0.0;
+    double gpuPercent = 0.0;
     int threadCount = 0;
 };
 

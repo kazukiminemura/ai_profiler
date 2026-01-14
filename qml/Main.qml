@@ -14,8 +14,8 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: 16
         spacing: 12
-        padding: 16
 
         Rectangle {
             Layout.fillWidth: true

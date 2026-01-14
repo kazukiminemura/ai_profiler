@@ -1,6 +1,7 @@
 #include "cpusampler.h"
 
 #include <QtCore/QDateTime>
+#include <QtCore/QString>
 #include <QtCore/QThread>
 
 #include <windows.h>
@@ -10,6 +11,27 @@ namespace {
 quint64 fileTimeToUInt64(const FILETIME &ft) {
     return (static_cast<quint64>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
 }
+
+QString win32ErrorMessage(DWORD error) {
+    wchar_t *buffer = nullptr;
+    const DWORD size = FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        error,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        reinterpret_cast<LPWSTR>(&buffer),
+        0,
+        nullptr);
+    QString message;
+    if (size && buffer) {
+        message = QString::fromWCharArray(buffer).trimmed();
+        LocalFree(buffer);
+    }
+    if (message.isEmpty()) {
+        message = QStringLiteral("Unknown error");
+    }
+    return message;
+}
 }
 
 CpuSampler::CpuSampler(QObject *parent) : QObject(parent) {}
@@ -18,7 +40,11 @@ void CpuSampler::startSampling(quint32 pid) {
     m_stop.storeRelease(false);
     HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
     if (!process) {
-        emit error(QStringLiteral("OpenProcess failed (pid=%1)").arg(pid));
+        const DWORD err = GetLastError();
+        emit error(QStringLiteral("OpenProcess failed (pid=%1, error=%2: %3). Try running as Administrator or target a process you own.")
+                       .arg(pid)
+                       .arg(err)
+                       .arg(win32ErrorMessage(err)));
         return;
     }
 

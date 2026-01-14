@@ -14,6 +14,7 @@ QVariant TimelineModel::data(const QModelIndex &index, int role) const {
     case TimeRole: return f.epochMs;
     case CpuRole: return f.cpuPercent;
     case RssRole: return f.rssMB;
+    case GpuRole: return f.gpuPercent;
     case ThreadsRole: return f.threadCount;
     default: return {};
     }
@@ -24,6 +25,7 @@ QHash<int, QByteArray> TimelineModel::roleNames() const {
         {TimeRole, "t"},
         {CpuRole, "cpu"},
         {RssRole, "rss"},
+        {GpuRole, "gpu"},
         {ThreadsRole, "threads"}
     };
 }
@@ -42,6 +44,7 @@ QVariantMap TimelineModel::get(int index) const {
     map.insert("t", f.epochMs);
     map.insert("cpu", f.cpuPercent);
     map.insert("rss", f.rssMB);
+    map.insert("gpu", f.gpuPercent);
     map.insert("threads", f.threadCount);
     return map;
 }
@@ -58,5 +61,5 @@ void TimelineModel::addFrame(const CounterFrame &frame) {
     m_frames.push_back(frame);
     endInsertRows();
     emit countChanged();
-    emit lastFrameChanged(frame);
+    emit lastFrameChanged(get(row));
 }
